@@ -36,5 +36,6 @@ namespace MvcMusicStore.Models
 
         public virtual Artist Artist { get; set; }
 
+        public virtual List<OrderDetail> OrderDetails { get; set; }
     }
 }
