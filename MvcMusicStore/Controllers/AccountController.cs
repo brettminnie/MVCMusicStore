@@ -6,6 +6,7 @@ using System.Web.Mvc;
 using System.Web.Routing;
 using System.Web.Security;
 using Mvc3ToolsUpdateWeb_Default.Models;
+using MvcMusicStore.Models;
 
 namespace Mvc3ToolsUpdateWeb_Default.Controllers
 {
@@ -30,6 +31,7 @@ namespace Mvc3ToolsUpdateWeb_Default.Controllers
             {
                 if (Membership.ValidateUser(model.UserName, model.Password))
                 {
+                    MigrateCart(model.UserName);
                     FormsAuthentication.SetAuthCookie(model.UserName, model.RememberMe);
                     if (Url.IsLocalUrl(returnUrl) && returnUrl.Length > 1 && returnUrl.StartsWith("/")
                         && !returnUrl.StartsWith("//") && !returnUrl.StartsWith("/\\"))
@@ -83,6 +85,7 @@ namespace Mvc3ToolsUpdateWeb_Default.Controllers
 
                 if (createStatus == MembershipCreateStatus.Success)
                 {
+                    MigrateCart(model.UserName);
                     FormsAuthentication.SetAuthCookie(model.UserName, false /* createPersistentCookie */);
                     return RedirectToAction("Index", "Home");
                 }
@@ -188,6 +191,19 @@ namespace Mvc3ToolsUpdateWeb_Default.Controllers
                     return "An unknown error occurred. Please verify your entry and try again. If the problem persists, please contact your system administrator.";
             }
         }
+        #endregion
+
+
+        #region Custom Functionality
+        
+        protected void MigrateCart(string userName)
+        {
+            var cart = ShoppingCart.GetCart(this.HttpContext);
+
+            cart.MigrateCart(userName);
+            Session[ShoppingCart.CartSessionKey] = userName;
+        }
+
         #endregion
     }
 }
